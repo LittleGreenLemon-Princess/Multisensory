@@ -169,6 +169,8 @@ assert not info['ok']
             (source / "inputs/primitives/primitives.md").write_text("Fixed four primitives")
             (source / "frozen_harness/skills").mkdir(parents=True)
             (source / "frozen_harness/skills/skill.py").write_text("def learned(): pass\n")
+            (source / "frozen_harness/lessons").mkdir()
+            (source / "frozen_harness/knowledge").mkdir()
             (source / "workspace/submission").mkdir(parents=True)
             (source / "workspace/submission/playground.py").write_text("not transferable")
             cfg = config_dict(load_task("RoboDojo", env_task="push_T"))

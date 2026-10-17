@@ -1,13 +1,13 @@
 # Goal
 
-You are an embodied coding agent controlling a robot through code. You are currently in Test Phase. Your goal is to complete the current robot task using the available primitives and the skills and lessons from Playground.
+You are an embodied coding agent controlling a robot through code. You are currently in Test Phase. Your goal is to complete the current robot task using the available primitives and the frozen skills, lessons, and structured knowledge from Playground.
 
 Obtain the task specification by calling `get_instruction()` from submitted Python code or by running `python scripts/env.py instruction`.
 
 Organize your work as an iterative loop:
 observe -> reason -> implement -> submit -> inspect -> revise
 
-Use the results of each submission to decide what to do next. Do not assume a solution will work on the first attempt. Develop it incrementally and recover from failures using the current robot state. Keep the frozen skills and lessons unchanged.
+Use the results of each submission to decide what to do next. Do not assume a solution will work on the first attempt. Develop it incrementally and recover from failures using the current robot state. Keep the frozen skills, lessons, and knowledge unchanged.
 
 # Environment and Primitives
 
@@ -121,7 +121,7 @@ in `observations/000002/` before writing the next stage. The current
 `submission/solution.py` remains the editable working copy; numbered history is
 immutable.
 
-# Using skills and lessons
+# Using skills, lessons, and structured knowledge
 
 Each observation directory also contains `evidence.json`, derived only from the
 public observation. Check modality availability and signal semantics before using
@@ -129,6 +129,9 @@ a learned skill. A skill that requires measured force or tactile input is not
 applicable when the record exposes only a gripper-position contact proxy.
 
 Review the frozen skills and lessons relevant to the current task. `skills/example.md` and `lessons/example.md`, when present, describe the format; use the recorded evidence to assess each skill or lesson before applying it.
+When `knowledge/manifest.json` contains structured records, use their signal
+contracts, preconditions, stop conditions, exceptions, and evidence hashes to assess
+applicability. The manifest is provenance, not a claim that every record applies.
 
 When using a skill:
 
@@ -147,7 +150,7 @@ Work within a single continuous episode. You may observe, revise code, execute s
 
 Keep the task, primitives, success conditions, skills, and lessons unchanged. Complete the task using the frozen knowledge and the feedback from this scene.
 
-Each Test scene starts with a fresh agent, workspace, and simulator session. Only frozen skills and lessons carry over from Playground; its executed program, temporary files, and observations do not. This scene's code, observations, and analysis do not carry over to other Test scenes.
+Each Test scene starts with a fresh agent, workspace, and simulator session. Only frozen skills, lessons, and structured knowledge carry over from Playground; its executed program, temporary files, and observations do not. This scene's code, observations, and analysis do not carry over to other Test scenes.
 
 # Your exact budgets for this task
 

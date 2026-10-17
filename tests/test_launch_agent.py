@@ -103,7 +103,7 @@ class LaunchModelTests(unittest.TestCase):
                         f"dst=/workspace/{component},readonly",
                         argv,
                     )
-                for component in ("skills", "lessons"):
+                for component in ("skills", "lessons", "knowledge"):
                     self.assertEqual(
                         f"type=bind,src={root / 'workspace' / component},"
                         f"dst=/workspace/{component},readonly" in argv,

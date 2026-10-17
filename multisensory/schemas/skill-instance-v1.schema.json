@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LittleGreenLemon-Princess/Multisensory/schemas/skill-instance-v1",
+  "title": "Executed skill-code instance",
+  "type": "object",
+  "required": ["schema", "id", "task", "task_family", "vertical_capability", "goal", "trigger", "code_ref", "code_sha256", "signal_contract", "evidence_refs", "outcome"],
+  "properties": {
+    "schema": {"const": "multisensory-skill-instance-v1"},
+    "id": {"type": "string", "minLength": 1},
+    "task": {"type": "string", "minLength": 1},
+    "task_family": {"type": "string", "minLength": 1},
+    "vertical_capability": {"enum": ["localization", "grasp", "transport", "manipulation", "long-horizon"]},
+    "goal": {"type": "string", "minLength": 1},
+    "trigger": {"type": "string", "minLength": 1},
+    "code_ref": {"type": "string", "minLength": 1},
+    "code_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "signal_contract": {"$ref": "#/$defs/signalContract"},
+    "evidence_refs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "outcome": {"type": "object", "required": ["success"], "properties": {"success": {"type": "boolean"}}}
+  },
+  "$defs": {
+    "signalContract": {
+      "type": "object",
+      "required": ["required"],
+      "properties": {
+        "required": {"type": "array", "items": {"$ref": "#/$defs/signal"}},
+        "optional": {"type": "array", "items": {"$ref": "#/$defs/signal"}}
+      }
+    },
+    "signal": {
+      "type": "object",
+      "required": ["path", "status"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "status": {"enum": ["measured", "derived", "proxy"]}
+      }
+    }
+  }
+}

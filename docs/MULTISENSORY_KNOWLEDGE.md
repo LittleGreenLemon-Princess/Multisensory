@@ -47,6 +47,12 @@ files, and outcome. A later consolidation stage will create canonical skills and
 principles only from repeated, reviewed instances; a single success must not
 directly create a general principle.
 
+PR 2 adds `multisensory-canonical-skill-v1`, `multisensory-principle-v1`, and
+`multisensory-knowledge-manifest-v1`. The host validates record relations and exact
+code hashes when Playground freezes. Public evidence referenced by a record remains
+in the Playground audit trail; its path and SHA-256 digest are carried into the
+manifest without copying episode observations into Test.
+
 Vertical capabilities are `localization`, `grasp`, `transport`, `manipulation`,
 and `long-horizon`. Spatial information is treated as a derived representation:
 metric 3D spatial evidence is available only when both public depth and camera

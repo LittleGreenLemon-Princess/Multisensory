@@ -19,7 +19,7 @@ in the new directory.
 ## Included
 
 - RoboDojo four-primitives adapter and persistent Python execution.
-- Playground, frozen Skills/Lessons and independent Test sessions.
+- Playground, frozen Skills/Lessons/structured knowledge and independent Test sessions.
 - Test-only baseline and handwritten workspace templates.
 - XPolicyLab policy, local native evaluation, and the shared single-scene image
   executor with an existing-allocation GPU check.

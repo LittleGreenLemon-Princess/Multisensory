@@ -68,7 +68,7 @@ def prepare_inputs(cfg, run):
         raise ValueError(f"Missing formal workspace source: {source}")
     hashes(source)  # Reject links before copying any part of the workspace.
     if cfg.baseline:
-        for component in ("skills", "lessons", "playground.md", "test.md"):
+        for component in ("skills", "lessons", "knowledge", "playground.md", "test.md"):
             if (source / component).exists():
                 raise ValueError(f"Baseline workspace cannot contain {component}")
     instructions = ("instruction.md",) if cfg.baseline else ("playground.md", "test.md")
@@ -128,11 +128,11 @@ def create_workspace(cfg, run, inputs, *, phase, harness=None, submission=None):
     # Empty runtime directories need not be present in a handwritten source tree.
     components = ("scratch", "observations")
     if not cfg.baseline:
-        components += ("skills", "lessons")
+        components += ("skills", "lessons", "knowledge")
     for component in components:
         (workspace / component).mkdir(exist_ok=True)
     if harness is not None:
-        for component in ("skills", "lessons"):
+        for component in ("skills", "lessons", "knowledge"):
             shutil.rmtree(workspace / component)
             shutil.copytree(harness / component, workspace / component)
     if submission is not None:
@@ -180,7 +180,7 @@ def agent_command(cfg, run, socket_dir, phase):
     ]
     fixed = ["instruction.md", "primitives", "scripts", "observations"]
     if phase == "test" and not cfg.baseline:
-        fixed += ["skills", "lessons"]
+        fixed += ["skills", "lessons", "knowledge"]
     if (run / "program-records.json").exists():
         from orchestrator.program_records import validate_bundle
 
@@ -671,10 +671,13 @@ def explore(cfg, run_dir, *, gpu=None, timeout_sec=None):
             return 1
         frozen = run / "frozen_harness"
         frozen.mkdir()
-        for component in ("skills", "lessons"):
+        for component in ("skills", "lessons", "knowledge"):
             source = run / "playground/workspace" / component
             hashes(source)
             shutil.copytree(source, frozen / component)
+        from multisensory.knowledge import build_frozen_manifest
+
+        build_frozen_manifest(run / "playground/workspace", frozen)
         state.update(
             phase="frozen",
             harness=hashes(frozen),
@@ -753,7 +756,7 @@ def prepare_test(cfg, run, *, create_plan=True, settings=None, seed_plan=None, f
             or result.get("failure")
             or state.get("harness") != hashes(frozen)
         ):
-            raise ValueError("Finish PlayGround and freeze skills/lessons before Test")
+            raise ValueError("Finish PlayGround and freeze skills/lessons/knowledge before Test")
     if frozen_source is not None:
         # Existing paired plans only: never call the sampling path, even
         # if a plan disappears between dependency validation and this read.

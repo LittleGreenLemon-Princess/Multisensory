@@ -73,10 +73,16 @@ def main():
                     status["completed"].append({"task": cfg.simulator.env_task, "phase": phase})
                     if phase == "playground":
                         state = read(task_run / "protocol.json")
-                        for part in ("skills", "lessons"):
+                        for part in ("skills", "lessons", "knowledge"):
                             source = task_run / "playground/episodes/episode_0000/workspace" / part
                             hashes(source)
                             shutil.copytree(source, task_run / "frozen_harness" / part)
+                        from multisensory.knowledge import build_frozen_manifest
+
+                        build_frozen_manifest(
+                            task_run / "playground/episodes/episode_0000/workspace",
+                            task_run / "frozen_harness",
+                        )
                         state.update(phase="frozen", playground_valid=True,
                                      harness=hashes(task_run / "frozen_harness"))
                         write_json(task_run / "protocol.json", state)

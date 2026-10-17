@@ -6,7 +6,7 @@ docs/PROTOCOL.md before changing execution or evaluation behavior.
 - Preserve `workspace-session-v1`: persistent Python sessions and exactly four
   primitives: `get_instruction()`, `get_observation()`, `step(action)`, and
   Playground-only `reset()`. Keep the primitive manual handwritten.
-- Only `skills/` and `lessons/` transfer from Playground to Test. Freeze them
+- Only `skills/`, `lessons/`, and `knowledge/` transfer from Playground to Test. Freeze them
   before selecting Test scenes. Each Test gets a fresh agent, workspace and
   simulator; knowledge is read-only, and reset and cross-scene learning are forbidden.
 - Preserve task goals, native action limits, success checks and raw feedback.
