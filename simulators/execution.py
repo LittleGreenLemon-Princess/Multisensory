@@ -6,10 +6,13 @@ import contextlib
 import copy
 import io
 import traceback
+from collections import deque
 
 from environments import Environment
 from simulators.interactive import NUMPY, SAFE_BUILTINS, validate_snippet
 from simulators.primitives import ObservationSpace, rgb_images
+
+SIGNAL_WINDOW_MAX_SAMPLES = 256
 
 
 class CodeTask(Environment):
@@ -20,6 +23,7 @@ class CodeTask(Environment):
         self._exec_globals = {}
         self._observation = None
         self._frames = {}
+        self._signal_observations = deque(maxlen=SIGNAL_WINDOW_MAX_SAMPLES)
         self.success = False
         self.terminated = False
         self.truncated = False
@@ -35,6 +39,7 @@ class CodeTask(Environment):
             self.control_steps = 0
             self._exec_globals = {}
             self._frames = {}
+            self._signal_observations = deque(maxlen=SIGNAL_WINDOW_MAX_SAMPLES)
         self._reset_seed = seed
         self._reset_options = copy.deepcopy(reset_options)
         self._reset_info = copy.deepcopy(reset_info or {})
@@ -65,6 +70,15 @@ class CodeTask(Environment):
 
     def observe(self, obs):
         self._observation = copy.deepcopy(obs)
+        self._signal_observations.append(
+            copy.deepcopy(
+                {
+                    key: obs[key]
+                    for key in ("state", "action", "additional_info")
+                    if key in obs
+                }
+            )
+        )
         for camera, frame in rgb_images(obs).items():
             self._frames.setdefault(camera, []).append(frame.copy())
 
@@ -103,6 +117,19 @@ class CodeTask(Environment):
                 ok = False
                 traceback.print_exc()
         frames, self._frames = self._frames, {}
+        signal_observations = list(self._signal_observations)
+        self._signal_observations = deque(
+            [
+                copy.deepcopy(
+                    {
+                        key: self._observation[key]
+                        for key in ("state", "action", "additional_info")
+                        if key in self._observation
+                    }
+                )
+            ],
+            maxlen=SIGNAL_WINDOW_MAX_SAMPLES,
+        )
         obs, reward, terminated, truncated, _ = self.transition(self.reward())
         return self.finish_step(
             obs,
@@ -114,6 +141,7 @@ class CodeTask(Environment):
                 "stdout": stdout.getvalue(),
                 "stderr": stderr.getvalue(),
                 "native_steps": self.control_steps,
+                "signal_observations": signal_observations,
             },
             frames=frames,
             success=self.success,

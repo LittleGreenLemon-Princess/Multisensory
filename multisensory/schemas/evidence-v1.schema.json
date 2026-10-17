@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LittleGreenLemon-Princess/Multisensory/schemas/evidence-v1",
+  "title": "Multisensory public-observation evidence",
+  "type": "object",
+  "required": [
+    "schema",
+    "timestamp_unix",
+    "source_boundary",
+    "modalities",
+    "proprioception",
+    "temporal",
+    "progress",
+    "limitations"
+  ],
+  "properties": {
+    "schema": {"const": "multisensory-evidence-v1"},
+    "timestamp_unix": {"type": "number"},
+    "source_boundary": {"const": "public_observation_only"},
+    "modalities": {
+      "type": "object",
+      "required": ["vision_rgb", "proprioception", "spatial", "force", "tactile", "contact"],
+      "additionalProperties": {
+        "type": "object",
+        "required": ["status", "sources"],
+        "properties": {
+          "status": {
+            "enum": ["measured", "derivable", "limited", "proxy_only", "unavailable"]
+          },
+          "sources": {"type": "array", "items": {"type": "string"}},
+          "note": {"type": "string"}
+        }
+      }
+    },
+    "proprioception": {"type": "object"},
+    "temporal": {
+      "type": "object",
+      "required": ["sampling_rate_hz", "window_samples", "native_step_window"]
+    },
+    "progress": {
+      "type": "object",
+      "required": ["state"],
+      "properties": {
+        "state": {"enum": ["unknown", "moving", "stationary"]}
+      }
+    },
+    "limitations": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}

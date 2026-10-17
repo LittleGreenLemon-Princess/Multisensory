@@ -283,6 +283,7 @@ class Session:
                 folder,
                 workspace=self.workspace,
                 evidence_tracker=self._evidence,
+                signal_window=result.signal_observations,
             )
             videos = write_videos(result.frames, folder, stem="execution", fps=self.fps)
             self._writable_state = capture_writable_changes(

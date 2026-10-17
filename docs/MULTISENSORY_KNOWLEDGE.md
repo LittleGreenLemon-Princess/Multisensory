@@ -4,6 +4,11 @@ This extension keeps the `workspace-session-v1` execution boundary and its four
 primitives unchanged. It adds host-derived, agent-visible evidence built only
 from the same public observation returned by `get_observation()`.
 
+The versioned JSON Schemas are packaged under `multisensory/schemas/`:
+
+- `public-signal-sample-v1.schema.json` defines the public, non-image native-step window;
+- `evidence-v1.schema.json` defines every generated `evidence.json` record.
+
 Each observation directory now includes `evidence.json`. The record distinguishes:
 
 - measured signals, such as joints, end-effector poses, and gripper state;
@@ -12,11 +17,13 @@ Each observation directory now includes `evidence.json`. The record distinguishe
 - unavailable signals, including force and tactile sensing when the native task
   does not expose them.
 
-`additional_info.frequency` records the native policy rate, but exported
-observation folders are produced per submitted program rather than at every native
-control tick. Consequently v1 does not compute an FFT from those folders. Spectral
-features require a future public, regularly sampled signal window; the policy-rate
-metadata by itself is not frequency evidence.
+`additional_info.frequency` records the native policy rate. During one submitted
+program, the host retains a bounded 256-sample, non-image window of the same public observation
+after each native action. The window supports command-state tracking error,
+no-progress detection, and detrended FFT-based oscillation features. Frequency
+features are emitted only when the window contains at least eight samples with a
+consistent positive sampling rate; policy-rate metadata by itself is not treated as
+frequency evidence.
 
 Missing force or tactile data is never represented by zero. Simulator-private
 object poses, contacts, scene identities, shaped rewards, and evaluator state are

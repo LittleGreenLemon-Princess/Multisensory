@@ -23,6 +23,7 @@ class _Native:
                 "stderr": "",
                 "task_completed": False,
                 "frames": {"front": ["frame"]},
+                "signal_observations": [{"state": {"joint": [0.0]}}],
             },
         )
 
@@ -66,6 +67,7 @@ class EnvironmentInterfaceTests(unittest.TestCase):
         self.assertEqual(result.index, 3)
         self.assertTrue(result.ok)
         self.assertEqual(result.frames, {"front": ["frame"]})
+        self.assertEqual(result.signal_observations, [{"state": {"joint": [0.0]}}])
         self.assertEqual(result.stdout, "done")
 
     def test_invalid_code_is_rejected_at_the_environment_boundary(self):

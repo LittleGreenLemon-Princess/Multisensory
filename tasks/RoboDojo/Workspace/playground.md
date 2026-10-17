@@ -130,6 +130,9 @@ public observation. Use it to distinguish measured proprioception, derived motio
 contact proxies, and unavailable force/tactile modalities. Never describe a proxy
 as measured force or tactile feedback. When recording a reusable result, cite the
 observation/execution IDs and state which signals support or contradict it.
+`temporal.native_step_window` reports no-progress and oscillation only when the
+public native-step window is long and regular enough; preserve an
+`insufficient_data` result rather than guessing.
 
 Read `skills/example.md` and `lessons/example.md` first.
 

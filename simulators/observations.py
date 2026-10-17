@@ -82,14 +82,17 @@ def write_public_observation(task, folder: Path) -> None:
 
 
 def export_observation(
-    task, folder: Path, *, workspace: Path, evidence_tracker=None
+    task, folder: Path, *, workspace: Path, evidence_tracker=None, signal_window=None
 ) -> list[str]:
     images = write_camera_images(task, folder, workspace=workspace)
     write_public_observation(task, folder)
     if evidence_tracker is not None:
         # The tracker receives only the same detached public observation exposed
         # to agent programs. It never receives native evaluator metadata.
-        write_json(folder / "evidence.json", evidence_tracker.observe(public_observation(task)))
+        write_json(
+            folder / "evidence.json",
+            evidence_tracker.observe(public_observation(task), signal_window=signal_window),
+        )
     manifest = folder / "images.json"
     temporary = manifest.with_suffix(".tmp")
     temporary.write_text(
