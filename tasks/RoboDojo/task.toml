@@ -38,3 +38,12 @@ scenes = 25
 budget = 100
 generation_timeout_sec = 0 # Unlimited Test agent session; execution slots remain bounded.
 submission_timeout_sec = 1200
+
+[knowledge]
+enabled = true
+retrieval = "signal_aware"
+modalities = ["vision_rgb", "proprioception", "spatial", "force", "tactile", "contact", "temporal"]
+max_skills = 8
+max_principles = 4
+include_instances = false
+use_exceptions = true

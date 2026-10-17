@@ -18,7 +18,7 @@ from unittest.mock import patch
 import numpy as np
 
 from environments import Environment
-from orchestrator.config import config_dict, config_from_dict, load_task
+from orchestrator.config import Knowledge, config_dict, config_from_dict, load_task
 from orchestrator.files import test_seeds as sample_test_seeds
 from orchestrator.session import Session, serve
 from orchestrator.session_runner import create_workspace, prepare_inputs
@@ -755,7 +755,7 @@ class RoboDojoTests(unittest.TestCase):
         for phase, limit in (("playground", 200), ("test", 800)):
             with self.subTest(phase=phase), tempfile.TemporaryDirectory() as tmp:
                 root = Path(tmp)
-                cfg = load_task("RoboDojo")
+                cfg = replace(load_task("RoboDojo"), knowledge=Knowledge())
                 prepare_inputs(cfg, root)
                 run = root / "episode"
                 workspace = create_workspace(cfg, run, root / "inputs", phase=phase)

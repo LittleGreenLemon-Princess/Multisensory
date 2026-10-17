@@ -15,6 +15,7 @@ from pathlib import Path
 
 from environments import execute
 from multisensory import EvidenceTracker
+from multisensory.retrieval import build_task_portfolio, portfolio_summary
 from orchestrator.config import SESSION_PROTOCOL, config_from_dict
 from orchestrator.files import append_jsonl, capture_writable_changes, write_json
 from orchestrator.scoring import capture as capture_scoring
@@ -77,7 +78,19 @@ def deadline(seconds):
 
 class Session:
     def __init__(
-        self, env, run, *, phase, seed, budget, seconds, execution_seconds, fps=15, event=None
+        self,
+        env,
+        run,
+        *,
+        phase,
+        seed,
+        budget,
+        seconds,
+        execution_seconds,
+        fps=15,
+        event=None,
+        knowledge=None,
+        task_query="",
     ):
         self.env, self.run = env, Path(run)
         self.workspace = self.run / "workspace"
@@ -93,6 +106,9 @@ class Session:
         self._writable_state = {}
         self._scoring = None
         self._scoring_finalized = False
+        self._portfolio = None
+        self._knowledge = knowledge
+        self._task_query = task_query
         self._evidence = EvidenceTracker()
         self.env.execution_phase = phase
         self.env.reset(seed=seed)
@@ -104,8 +120,32 @@ class Session:
             workspace=self.workspace,
             evidence_tracker=self._evidence,
         )
+        if phase == "test" and knowledge is not None and knowledge.enabled:
+            prompt = getattr(self.env, "task_prompt", None)
+            public_instruction = prompt() if callable(prompt) else ""
+            self._task_query = " ".join(
+                item.strip()
+                for item in (task_query, public_instruction)
+                if isinstance(item, str) and item.strip()
+            )
+            self._refresh_portfolio(self.workspace / self.latest)
         self.started = time.monotonic()
         self.save()
+
+    def _refresh_portfolio(self, observation: Path) -> None:
+        portfolio = build_task_portfolio(
+            self.workspace / "knowledge",
+            json.loads((observation / "evidence.json").read_text()),
+            self._task_query,
+            self._knowledge,
+            evidence_ref=str((observation / "evidence.json").relative_to(self.workspace)),
+        )
+        execution = int(observation.name)
+        audit_record = f"knowledge-portfolios/{execution:06d}.json"
+        write_json(self.workspace / "knowledge/portfolio.json", portfolio)
+        write_json(self.run / audit_record, portfolio)
+        write_json(observation / "portfolio.json", portfolio)
+        self._portfolio = portfolio_summary(portfolio, record=audit_record)
 
     @staticmethod
     def _request_summary(request):
@@ -195,6 +235,11 @@ class Session:
                 "protocol": SESSION_PROTOCOL,
                 "valid": self.valid,
                 "task_completed": bool(self.env.success),
+                **(
+                    {"knowledge_portfolio": self._portfolio}
+                    if self._portfolio is not None
+                    else {}
+                ),
                 **(self._scoring or {}),
             },
         )
@@ -285,6 +330,8 @@ class Session:
                 evidence_tracker=self._evidence,
                 signal_window=result.signal_observations,
             )
+            if self.phase == "test" and self._knowledge is not None and self._knowledge.enabled:
+                self._refresh_portfolio(folder)
             videos = write_videos(result.frames, folder, stem="execution", fps=self.fps)
             self._writable_state = capture_writable_changes(
                 self.workspace, folder, self._writable_state
@@ -355,6 +402,8 @@ def serve(cfg, run, socket_path, *, phase, seed, budget, seconds, execution_seco
             execution_seconds=execution_seconds,
             fps=cfg.feedback_fps,
             event=event,
+            knowledge=cfg.knowledge,
+            task_query=f"{cfg.simulator.env_task} {cfg.description}",
         )
         with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as listener:
             listener.bind(str(socket_path))

@@ -148,6 +148,7 @@ def build_frozen_manifest(workspace: Path, frozen_harness: Path) -> dict:
         raise ValueError("frozen harness requires skills, lessons, and knowledge directories")
     manifest_path = knowledge / "manifest.json"
     manifest_path.unlink(missing_ok=True)
+    (knowledge / "portfolio.json").unlink(missing_ok=True)
     records, by_kind = _load_records(knowledge)
     _validate_relations(records, by_kind)
 

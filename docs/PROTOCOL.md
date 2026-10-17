@@ -38,6 +38,12 @@ Test allows iterative observation and coding within the current scene. It
 forbids reset and transfer between Test scenes. Resume reuses the saved scene
 plan and does not silently rerun completed or failed attempts.
 
+When structured retrieval is enabled, each Test session derives a task-time
+portfolio from its initial public `evidence.json` before the agent starts. The
+portfolio refreshes after subsequent evidence, and each version plus its signal-gate
+rejections is preserved as read-only agent input and host audit output. Retrieval
+never changes task goals, action limits, success checks, or raw feedback.
+
 The Test-only baseline has its own instruction template and no Playground or
 transferred knowledge. Public recipes are supplied task information; their
 default inclusion is the same for both task templates. Set

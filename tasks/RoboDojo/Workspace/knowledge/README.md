@@ -9,11 +9,14 @@ knowledge/
   skills/*.json      reviewed canonical reusable skills
   principles/*.json  evidence-grounded decision rules
   manifest.json      host-generated only when Playground freezes
+  portfolio.json     host-generated for the current Test scene
 ```
 
 Do not create or edit `manifest.json`; the host regenerates it from exact file,
 code, and evidence hashes. Existing Python helpers in `skills/` and Markdown in
 `lessons/` remain valid even when there are no structured records.
+The Test host also creates `portfolio.json` from the initial public evidence. It is
+scene-specific and is never transferred back into the frozen library.
 
 Use these required fields:
 

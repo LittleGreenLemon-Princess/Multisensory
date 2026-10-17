@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import json
 import hashlib
+import json
 import os
 import select
 import shutil
@@ -21,9 +21,9 @@ from orchestrator.files import (
     codex_token_usage,
     hashes,
     run_lock,
-    test_seeds,
     shared_test_seeds,
     test_scene_records,
+    test_seeds,
     valid_test_seeds,
     write_json,
 )
@@ -42,6 +42,12 @@ def validate(cfg):
         raise ValueError("Workspace sessions require Docker isolation")
     if cfg.baseline != (cfg.playground is None):
         raise ValueError("Only baseline tasks may omit Playground")
+    if cfg.baseline and cfg.knowledge.enabled:
+        raise ValueError("Baseline must not enable structured knowledge retrieval")
+    if cfg.knowledge.retrieval not in {"signal_aware", "all", "none"}:
+        raise ValueError("Knowledge retrieval must be signal_aware, all, or none")
+    if cfg.knowledge.max_skills < 0 or cfg.knowledge.max_principles < 0:
+        raise ValueError("Knowledge retrieval limits must be non-negative")
     if not cfg.expose_success_feedback:
         raise ValueError("Session instructions and native primitives expose official success")
     limits = [cfg.test.budget, cfg.test.scenes, cfg.test.submission_timeout_sec, cfg.feedback_fps]
@@ -560,6 +566,7 @@ def run_episode(
 
     path = run / "session-result.json"
     state = json.loads(path.read_text()) if path.exists() else {}
+    portfolio = state.get("knowledge_portfolio")
     valid = (
         failure is None
         and bool(state.get("valid"))
@@ -584,6 +591,9 @@ def run_episode(
         "failure": failure,
         "task_completed": bool(state.get("task_completed")) if valid else False,
         "timing": timing,
+        "knowledge_portfolio": None
+        if portfolio is None
+        else portfolio,
         **result_score(run, state, valid=valid),
     }
     # The agent and its simulator are stopped before archival replay. Its

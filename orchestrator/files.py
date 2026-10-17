@@ -121,6 +121,8 @@ def capture_writable_changes(
             if not path.is_file():
                 continue
             relative = str(path.relative_to(workspace))
+            if relative == "knowledge/portfolio.json":
+                continue  # Host-generated Test input, not an agent-authored workspace change.
             digest = hashlib.sha256(path.read_bytes()).hexdigest()
             current[relative] = digest
             if previous.get(relative) == digest:
