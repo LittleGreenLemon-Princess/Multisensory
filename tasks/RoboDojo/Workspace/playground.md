@@ -125,6 +125,15 @@ immutable.
 
 # Evolution: skills and lessons
 
+Each observation directory also contains `evidence.json`, derived only from the
+public observation. Use it to distinguish measured proprioception, derived motion,
+contact proxies, and unavailable force/tactile modalities. Never describe a proxy
+as measured force or tactile feedback. When recording a reusable result, cite the
+observation/execution IDs and state which signals support or contradict it.
+`temporal.native_step_window` reports no-progress and oscillation only when the
+public native-step window is long and regular enough; preserve an
+`insufficient_data` result rather than guessing.
+
 Read `skills/example.md` and `lessons/example.md` first.
 
 A skill should capture a general behavior or procedure, not merely rename a sequence of open-loop `step` calls. A useful skill should:

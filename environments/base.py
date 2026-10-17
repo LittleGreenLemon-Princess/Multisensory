@@ -167,6 +167,7 @@ class StepResult:
     terminated: bool = False
     truncated: bool = False
     frames: dict[str, list[Any]] = field(default_factory=dict)
+    signal_observations: list[dict[str, Any]] = field(default_factory=list)
 
 
 def execute(environment: Any, code: str, *, index: int | None = None) -> StepResult:
@@ -178,6 +179,7 @@ def execute(environment: Any, code: str, *, index: int | None = None) -> StepRes
     _observation, reward, terminated, truncated, raw_info = transition
     info = dict(raw_info or {})
     frames = dict(info.get("frames", {}) or {})
+    signal_observations = list(info.get("signal_observations", []) or [])
     ok = bool(info["ok"])
     success = bool(info.get("task_completed", terminated))
     return StepResult(
@@ -191,6 +193,7 @@ def execute(environment: Any, code: str, *, index: int | None = None) -> StepRes
         terminated=bool(terminated),
         truncated=bool(truncated),
         frames=frames,
+        signal_observations=signal_observations,
     )
 
 

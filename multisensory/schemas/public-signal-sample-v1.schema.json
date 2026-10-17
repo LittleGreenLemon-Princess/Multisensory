@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LittleGreenLemon-Princess/Multisensory/schemas/public-signal-sample-v1",
+  "title": "Public native-step signal sample",
+  "type": "object",
+  "properties": {
+    "state": {
+      "type": "object",
+      "description": "Measured public robot state using native field names."
+    },
+    "action": {
+      "type": "object",
+      "description": "Latest native public command using the same keys as state."
+    },
+    "additional_info": {
+      "type": "object",
+      "properties": {
+        "frequency": {"type": "number", "exclusiveMinimum": 0}
+      }
+    }
+  },
+  "required": ["state"],
+  "additionalProperties": false
+}

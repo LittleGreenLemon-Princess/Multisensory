@@ -20,10 +20,18 @@ policy = ["websockets==15.0.1"]
 embodiedevo = "orchestrator.__main__:main"
 
 [tool.setuptools.packages.find]
-include = ["simulators*", "environments*", "orchestrator*", "integrations*", "scripts*"]
+include = [
+  "simulators*",
+  "environments*",
+  "orchestrator*",
+  "integrations*",
+  "multisensory*",
+  "scripts*",
+]
 
 [tool.setuptools.package-data]
 orchestrator = ["*.md", "instructions/*.md"]
+multisensory = ["schemas/*.json"]
 "integrations.robodojo_policy.policy.EmbodiedEvo" = ["deploy.yml"]
 
 [tool.ruff]
