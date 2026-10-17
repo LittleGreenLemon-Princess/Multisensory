@@ -29,7 +29,9 @@ Playground uses its fixed configured scene. It permits same-scene reset, which
 renews the native action allowance while preserving Python variables, consumed
 execution requests and elapsed time. Skills and Lessons are writable.
 
-At completion, the host freezes only `skills/` and `lessons/`. It then samples
+At completion, the host freezes only `skills/`, `lessons/`, and optional structured
+`knowledge/`. The host generates an immutable knowledge manifest that binds records
+to exact code and public evidence hashes. It then samples
 and persists Test scene identities. Each Test starts a fresh agent, workspace
 and simulator, with read-only knowledge and no inherited Playground program.
 Test allows iterative observation and coding within the current scene. It

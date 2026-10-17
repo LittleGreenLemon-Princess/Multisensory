@@ -38,7 +38,7 @@ TOKEN_FIELDS = (
     "total_tokens",
 )
 
-WRITABLE_COMPONENTS = ("skills", "lessons", "submission", "scratch")
+WRITABLE_COMPONENTS = ("skills", "lessons", "knowledge", "submission", "scratch")
 
 
 def codex_token_usage(home: Path) -> dict:

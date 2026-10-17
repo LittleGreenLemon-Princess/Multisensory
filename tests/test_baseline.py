@@ -76,7 +76,7 @@ class BaselineTests(unittest.TestCase):
                 run = self.root / definition.parent.name
                 session_runner.prepare_inputs(cfg, run)
                 self.assertTrue((run / "inputs/instruction.md").is_file())
-                for name in ("skills", "lessons", "playground.md", "test.md"):
+                for name in ("skills", "lessons", "knowledge", "playground.md", "test.md"):
                     self.assertFalse((run / "inputs" / name).exists())
         regular = config_dict(load_task("RoboDojo"))
         self.assertNotIn("baseline", regular)
@@ -175,7 +175,7 @@ class BaselineTests(unittest.TestCase):
         task.write_text(task.read_text() + "\n[playground]\nseed = 0\n")
         with self.assertRaisesRegex(ValueError, r"remove \[playground\]"):
             load_task(cfg.root)
-        for name in ("skills", "lessons", "playground.md", "test.md"):
+        for name in ("skills", "lessons", "knowledge", "playground.md", "test.md"):
             with self.subTest(name=name):
                 path = cfg.workspace / name
                 path.touch()
@@ -273,7 +273,12 @@ class BaselineTests(unittest.TestCase):
                 self.cfg, self.root, self.root / "socket", "test"
             )
         mounts = [item for item in argv if item.startswith("type=bind,")]
-        self.assertFalse(any("/skills" in item or "/lessons" in item for item in mounts))
+        self.assertFalse(
+            any(
+                any(f"/{name}" in item for name in ("skills", "lessons", "knowledge"))
+                for item in mounts
+            )
+        )
         for component in ("instruction.md", "primitives", "scripts", "observations"):
             self.assertTrue(any(f"dst=/workspace/{component},readonly" in m for m in mounts))
 

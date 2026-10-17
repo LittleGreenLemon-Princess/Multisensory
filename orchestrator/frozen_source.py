@@ -1,4 +1,4 @@
-"""Host-only provenance and immutable Skills/Lessons for external Test campaigns."""
+"""Host-only provenance and immutable learned knowledge for external Test campaigns."""
 
 import hashlib
 import json
@@ -74,8 +74,11 @@ def snapshot(source):
     frozen = run / "frozen_harness"
     if (protocol.get("definition") != source["definition"]
             or protocol.get("harness") != hashes(frozen)
-            or {p.name for p in frozen.iterdir()} != {"skills", "lessons"}
-            or any(not (frozen / name).is_dir() for name in ("skills", "lessons"))):
+            or {p.name for p in frozen.iterdir()} != {"skills", "lessons", "knowledge"}
+            or any(
+                not (frozen / name).is_dir()
+                for name in ("skills", "lessons", "knowledge")
+            )):
         raise ValueError("External frozen harness or task definition changed")
     return {"harness": protocol["harness"],
             "protocol_sha256": digest(run / "protocol.json"),
@@ -118,7 +121,7 @@ def prepare(cfg, run, source):
         raise ValueError("External Test requires a fresh task run or its pinned protocol")
     inputs = session_runner.prepare_inputs(cfg, run)
     if records:
-        for name in ("skills", "lessons"):
+        for name in ("skills", "lessons", "knowledge"):
             shutil.rmtree(run / "inputs" / name)
             (run / "inputs" / name).mkdir()
             (run / "frozen_harness" / name).mkdir(parents=True)

@@ -21,7 +21,7 @@ an intact `protocol.json` and `frozen_harness/`:
 
 Replace the source-run placeholder with your actual frozen run. The adapter pins
 its source and frozen knowledge before native scene selection. Each trial gets
-a new agent and Python worker; only Skills/Lessons transfer. Test reset remains
+a new agent and Python worker; only Skills, Lessons, and structured knowledge transfer. Test reset remains
 forbidden. Preserve native reports and videos under `official/eval_result/`.
 A one-episode trial is a subset, not a full leaderboard result.
 

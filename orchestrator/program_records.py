@@ -19,7 +19,15 @@ PUBLIC_FILES = {
 
 def reject_private_fields(value):
     if isinstance(value, dict):
-        if set(value) & {"score", "reward", "shaped_reward", "ledger", "skills", "lessons"}:
+        if set(value) & {
+            "score",
+            "reward",
+            "shaped_reward",
+            "ledger",
+            "skills",
+            "lessons",
+            "knowledge",
+        }:
             raise ValueError("Private score or knowledge in public Playground feedback")
         for child in value.values():
             reject_private_fields(child)

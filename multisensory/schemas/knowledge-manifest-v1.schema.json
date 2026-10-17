@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LittleGreenLemon-Princess/Multisensory/schemas/knowledge-manifest-v1",
+  "title": "Frozen structured knowledge manifest",
+  "type": "object",
+  "required": ["schema", "source_boundary", "files", "records", "evidence_bindings", "compatibility"],
+  "properties": {
+    "schema": {"const": "multisensory-knowledge-manifest-v1"},
+    "source_boundary": {"const": "playground_public_evidence"},
+    "files": {"type": "object", "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"}},
+    "records": {
+      "type": "object",
+      "required": ["instances", "skills", "principles"],
+      "additionalProperties": {"type": "array", "items": {"type": "string"}}
+    },
+    "evidence_bindings": {"type": "array"},
+    "compatibility": {"type": "object"}
+  },
+  "additionalProperties": false
+}

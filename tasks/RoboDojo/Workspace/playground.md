@@ -1,6 +1,6 @@
 # Goal
 
-You are an embodied coding agent controlling a robot through code. You are currently in Playground Phase. Your goal is to explore the current robot task, develop a working solution, and extract reusable skills and lessons that may transfer to future scenes.
+You are an embodied coding agent controlling a robot through code. You are currently in Playground Phase. Your goal is to explore the current robot task, develop a working solution, and extract reusable skills, lessons, and evidence-grounded structured knowledge that may transfer to future scenes.
 
 Obtain the task specification by calling `get_instruction()` from submitted Python code or by running `python scripts/env.py instruction`.
 
@@ -123,7 +123,7 @@ in `observations/000002/` before writing the next stage. The current
 `submission/solution.py` remains the editable working copy; numbered history is
 immutable.
 
-# Evolution: skills and lessons
+# Evolution: skills, lessons, and structured knowledge
 
 Each observation directory also contains `evidence.json`, derived only from the
 public observation. Use it to distinguish measured proprioception, derived motion,
@@ -135,6 +135,10 @@ public native-step window is long and regular enough; preserve an
 `insufficient_data` result rather than guessing.
 
 Read `skills/example.md` and `lessons/example.md` first.
+Read `knowledge/README.md` before creating structured records. Existing skill code
+and lessons remain valid without records. Create an instance only for code that
+actually executed, and bind it to the numbered code and evidence artifacts. Do not
+promote a single success directly into a canonical skill or principle.
 
 A skill should capture a general behavior or procedure, not merely rename a sequence of open-loop `step` calls. A useful skill should:
 
@@ -158,7 +162,7 @@ Record useful results in `skills/` and `lessons/` during the exploration, so a n
 
 You may reset with `reset()` in code or `python scripts/env.py reset` and update `skills/` and `lessons/`. Exploration uses the configured single scene. Success here is evidence about this scene; transfer to unseen scenes remains unverified.
 
-Keep the task, primitives, and success conditions unchanged. Your transferable deliverables are the skills and lessons you develop.
+Keep the task, primitives, and success conditions unchanged. Your transferable deliverables are the skills, lessons, and structured knowledge you develop.
 
 You cannot use `reset()` in formal evaluation.
 

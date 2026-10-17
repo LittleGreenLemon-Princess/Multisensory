@@ -27,8 +27,8 @@ knowledge lives in reusable code and written lessons in the workspace.
    reusable helpers in `skills/` and practical guidance in `lessons/`, such as
    grasping from above, verifying a grasp, or carrying an object in small steps.
    Playground permits same-scene resets while the agent refines this knowledge.
-3. **Freeze and reuse in Test.** Freeze only `skills/` and `lessons/` before
-   selecting Test scenes. Each scene starts with a fresh agent, workspace, and
+3. **Freeze and reuse in Test.** Freeze `skills/`, `lessons/`, and structured
+   `knowledge/` before selecting Test scenes. Each scene starts with a fresh agent, workspace, and
    simulator. The transferred knowledge is read-only; the agent can observe and
    revise code within the scene, but cannot reset or learn across Test scenes.
 
