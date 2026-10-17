@@ -14,6 +14,7 @@ import traceback
 from pathlib import Path
 
 from environments import execute
+from multisensory import EvidenceTracker
 from orchestrator.config import SESSION_PROTOCOL, config_from_dict
 from orchestrator.files import append_jsonl, capture_writable_changes, write_json
 from orchestrator.scoring import capture as capture_scoring
@@ -92,11 +93,17 @@ class Session:
         self._writable_state = {}
         self._scoring = None
         self._scoring_finalized = False
+        self._evidence = EvidenceTracker()
         self.env.execution_phase = phase
         self.env.reset(seed=seed)
         bind_instruction_budgets(self.workspace, self.env, self.budget)
         self._scoring = capture_scoring(self.env, self.run, execution=0)
-        export_observation(env, self.workspace / self.latest, workspace=self.workspace)
+        export_observation(
+            env,
+            self.workspace / self.latest,
+            workspace=self.workspace,
+            evidence_tracker=self._evidence,
+        )
         self.started = time.monotonic()
         self.save()
 
@@ -271,7 +278,12 @@ class Session:
             # discard a successfully captured native evaluator state.
             self._scoring = capture_scoring(self.env, self.run, execution=self.used)
             feedback_started = time.monotonic()
-            export_observation(self.env, folder, workspace=self.workspace)
+            export_observation(
+                self.env,
+                folder,
+                workspace=self.workspace,
+                evidence_tracker=self._evidence,
+            )
             videos = write_videos(result.frames, folder, stem="execution", fps=self.fps)
             self._writable_state = capture_writable_changes(
                 self.workspace, folder, self._writable_state

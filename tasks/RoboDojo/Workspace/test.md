@@ -123,6 +123,11 @@ immutable.
 
 # Using skills and lessons
 
+Each observation directory also contains `evidence.json`, derived only from the
+public observation. Check modality availability and signal semantics before using
+a learned skill. A skill that requires measured force or tactile input is not
+applicable when the record exposes only a gripper-position contact proxy.
+
 Review the frozen skills and lessons relevant to the current task. `skills/example.md` and `lessons/example.md`, when present, describe the format; use the recorded evidence to assess each skill or lesson before applying it.
 
 When using a skill:
