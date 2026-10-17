@@ -31,6 +31,10 @@ knowledge lives in reusable code and written lessons in the workspace.
    `knowledge/` before selecting Test scenes. Each scene starts with a fresh agent, workspace, and
    simulator. The transferred knowledge is read-only; the agent can observe and
    revise code within the scene, but cannot reset or learn across Test scenes.
+4. **Retrieve with live signal availability.** At Test start, build an auditable
+   portfolio of applicable skills and principles. Required force/tactile signals
+   cannot be satisfied by gripper-position proxies, and modality/knowledge
+   ablations are recorded for experiment export.
 
 ## Setup
 

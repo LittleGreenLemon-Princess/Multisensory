@@ -10,6 +10,7 @@ import json
 import os
 import tomllib
 from dataclasses import asdict, dataclass
+from dataclasses import field as dataclass_field
 from pathlib import Path
 
 CODE_ROOT = Path(__file__).resolve().parents[1]
@@ -78,6 +79,27 @@ class Test:
 
 
 @dataclass(frozen=True)
+class Knowledge:
+    """Task-time retrieval and ablation settings for structured knowledge."""
+
+    enabled: bool = False
+    retrieval: str = "signal_aware"  # signal_aware | all | none
+    modalities: tuple[str, ...] = (
+        "vision_rgb",
+        "proprioception",
+        "spatial",
+        "force",
+        "tactile",
+        "contact",
+        "temporal",
+    )
+    max_skills: int = 8
+    max_principles: int = 4
+    include_instances: bool = False
+    use_exceptions: bool = True
+
+
+@dataclass(frozen=True)
 class TaskConfig:
     root: Path
     name: str
@@ -86,6 +108,7 @@ class TaskConfig:
     agent: Agent
     playground: Playground | None
     test: Test
+    knowledge: Knowledge = dataclass_field(default_factory=Knowledge)
     workspace_source: str = "Workspace"
     protocol: str = SESSION_PROTOCOL
     baseline: bool = False
@@ -143,6 +166,7 @@ def load_task(root: Path | str, *, env_task: str | None = None) -> TaskConfig:
     if type(baseline) is not bool:
         raise ValueError("[task].baseline must be a boolean")
     p1, p2 = data.get("playground"), dict(data["test"])
+    knowledge = dict(data.get("knowledge", {}))
     if baseline and p1 is not None:
         raise ValueError("Baseline tasks start Test directly; remove [playground]")
     if not baseline and p1 is None:
@@ -215,6 +239,15 @@ def load_task(root: Path | str, *, env_task: str | None = None) -> TaskConfig:
             shared_plan=p2.get("shared_plan"),
             excluded_seed=p2.get("excluded_seed"),
         ),
+        knowledge=Knowledge(
+            enabled=bool(knowledge.get("enabled", False)),
+            retrieval=str(knowledge.get("retrieval", "signal_aware")),
+            modalities=tuple(knowledge.get("modalities", Knowledge().modalities)),
+            max_skills=int(knowledge.get("max_skills", 8)),
+            max_principles=int(knowledge.get("max_principles", 4)),
+            include_instances=bool(knowledge.get("include_instances", False)),
+            use_exceptions=bool(knowledge.get("use_exceptions", True)),
+        ),
         workspace_source=str(data.get("workspace", {}).get("source", "Workspace")),
         protocol=SESSION_PROTOCOL,
         baseline=baseline,
@@ -227,6 +260,8 @@ def config_dict(cfg: TaskConfig) -> dict:
     data["root"] = str(cfg.root)
     if not data["baseline"]:
         del data["baseline"]  # Keep existing pinned runs compatible.
+    if cfg.knowledge == Knowledge():
+        del data["knowledge"]  # Keep runs without retrieval configuration compatible.
     for key in ("feedback_fps", "expose_success_feedback", "shared_plan", "excluded_seed"):
         if data["test"][key] is None:
             del data["test"][key]
@@ -245,6 +280,9 @@ def config_from_dict(data: dict) -> TaskConfig:
     data["root"] = Path(data["root"])
     data["simulator"] = Simulator(**data["simulator"])
     data["agent"] = Agent(**data["agent"])
+    knowledge = dict(data.get("knowledge", {}))
+    knowledge["modalities"] = tuple(knowledge.get("modalities", Knowledge().modalities))
+    data["knowledge"] = Knowledge(**knowledge)
     if data["playground"] is not None:
         data["playground"] = Playground(**data["playground"])
     data["test"] = Test(**data["test"])

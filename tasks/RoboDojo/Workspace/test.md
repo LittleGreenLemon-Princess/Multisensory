@@ -28,6 +28,7 @@ workspace/
 │   └── primitives.md
 ├── skills/                 # Frozen reusable code and usage notes; read-only
 ├── lessons/                # Frozen findings and failure experience; read-only
+├── knowledge/              # Frozen records, manifest, and task portfolio; read-only
 ├── submission/             # Current working code; writable
 │   └── solution.py
 ├── scripts/                # Read-only execution client
@@ -132,6 +133,12 @@ Review the frozen skills and lessons relevant to the current task. `skills/examp
 When `knowledge/manifest.json` contains structured records, use their signal
 contracts, preconditions, stop conditions, exceptions, and evidence hashes to assess
 applicability. The manifest is provenance, not a claim that every record applies.
+Read `knowledge/portfolio.json` first when present. It records the enabled modality
+ablation, observed signal availability, ranked skills and principles, exception
+warnings, and every signal-gate rejection. A rejected skill must not be revived by
+silently treating a proxy as measured force or tactile input.
+The host refreshes this file after each execution, so re-read it when temporal
+evidence such as no-progress or oscillation may have changed applicability.
 
 When using a skill:
 

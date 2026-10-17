@@ -22,7 +22,8 @@ def run_probe(connection, spec, observation, step_limit, episode):
         limits = cfg.playground if phase == "playground" else cfg.test
         session = Session(env, run, phase=phase, seed=0, budget=limits.budget,
                           seconds=None, execution_seconds=limits.submission_timeout_sec,
-                          fps=cfg.feedback_fps)
+                          fps=cfg.feedback_fps, knowledge=cfg.knowledge,
+                          task_query=f"{cfg.simulator.env_task} {cfg.description}")
 
         def execute(code):
             response = session.handle({"op": "exec", "files": [{"path": "probe.py", "code": code}]})

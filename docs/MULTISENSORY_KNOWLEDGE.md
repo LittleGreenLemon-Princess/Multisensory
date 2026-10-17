@@ -53,6 +53,35 @@ code hashes when Playground freezes. Public evidence referenced by a record rema
 in the Playground audit trail; its path and SHA-256 digest are carried into the
 manifest without copying episode observations into Test.
 
+PR 3 turns the frozen library into a task-time portfolio. After the initial Test
+observation, the host compares every required signal against public modality
+availability, rejects incompatible records, ranks applicable skills and principles,
+and writes the auditable decision to `knowledge/portfolio.json` before the agent
+starts. It refreshes the portfolio after every new evidence record, allowing
+no-progress, tracking-error, and oscillation skills to become applicable during
+recovery. Every version remains under the host's `knowledge-portfolios/` audit
+directory and beside its numbered observation. Retrieval is deterministic and
+lexical, so the experiment introduces no unreported embedding model or extra model
+call.
+
+The `[knowledge]` task configuration defines modality and knowledge ablations:
+
+- `retrieval = "signal_aware"` applies the availability gate;
+- `retrieval = "all"` retrieves without the gate as a retrieval ablation;
+- `retrieval = "none"` disables structured retrieval;
+- `modalities` removes selected evidence channels before gating;
+- `include_instances` controls whether task-specific examples enter the portfolio;
+- `use_exceptions` controls exception warnings and ranking penalties.
+
+Run `embodiedevo export --run-dir RUN --output-dir OUTPUT` to produce aggregate
+`experiment.json` and per-scene `scenes.csv` files containing outcomes, scores,
+budgets, token usage, retrieval counts, and modality availability.
+
+The same ablations can be pinned from the CLI with `--knowledge-retrieval`,
+`--knowledge-modalities`, `--knowledge-instances`/`--no-knowledge-instances`, and
+`--knowledge-exceptions`/`--no-knowledge-exceptions`. Each override becomes part
+of `resolved.json`, so resumed runs cannot silently change experimental conditions.
+
 Vertical capabilities are `localization`, `grasp`, `transport`, `manipulation`,
 and `long-horizon`. Spatial information is treated as a derived representation:
 metric 3D spatial evidence is available only when both public depth and camera

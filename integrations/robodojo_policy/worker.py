@@ -13,8 +13,8 @@ import time
 import traceback
 from pathlib import Path
 
-from orchestrator.config import REPO, config_from_dict
 from orchestrator.agent_recovery import recovery_reason, resume_argv, rollout_state
+from orchestrator.config import REPO, config_from_dict
 from orchestrator.files import codex_token_usage, write_json
 from orchestrator.session import Session
 from orchestrator.session_client import receive, send
@@ -61,7 +61,8 @@ def run_worker(connection, specification, observation, step_limit, episode):
         limits = cfg.playground if phase == "playground" else cfg.test
         session = Session(env, run, phase=phase, seed=0, budget=limits.budget,
                           seconds=specification.get("seconds"), execution_seconds=limits.submission_timeout_sec,
-                          fps=cfg.feedback_fps)
+                          fps=cfg.feedback_fps, knowledge=cfg.knowledge,
+                          task_query=f"{cfg.simulator.env_task} {cfg.description}")
         with (tempfile.TemporaryDirectory(prefix="embodiedevo-xpolicy-", ignore_cleanup_errors=True) as temporary,
               contextlib.ExitStack() as logs):
             socket_dir = Path(temporary)

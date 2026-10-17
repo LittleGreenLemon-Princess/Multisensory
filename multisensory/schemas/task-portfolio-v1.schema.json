@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LittleGreenLemon-Princess/Multisensory/schemas/task-portfolio-v1",
+  "title": "Signal-aware task-time knowledge portfolio",
+  "type": "object",
+  "required": ["schema", "query", "evidence_ref", "retrieval", "settings", "availability", "skills", "principles", "instances", "rejected", "metrics"],
+  "properties": {
+    "schema": {"const": "multisensory-task-portfolio-v1"},
+    "query": {"type": "string"},
+    "evidence_ref": {"type": ["string", "null"]},
+    "retrieval": {"enum": ["signal_aware", "all", "none"]},
+    "settings": {"type": "object"},
+    "availability": {"type": "object"},
+    "skills": {"type": "array"},
+    "principles": {"type": "array"},
+    "instances": {"type": "array"},
+    "rejected": {"type": "array"},
+    "metrics": {"type": "object"}
+  },
+  "additionalProperties": false
+}

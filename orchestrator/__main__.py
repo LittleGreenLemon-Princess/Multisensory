@@ -34,6 +34,27 @@ def _common(parser: argparse.ArgumentParser) -> None:
         default=1,
         help="maximum concurrent Test simulators per GPU (default: 1)",
     )
+    parser.add_argument(
+        "--knowledge-retrieval",
+        choices=("signal_aware", "all", "none"),
+        help="override structured-knowledge retrieval for an ablation run",
+    )
+    parser.add_argument(
+        "--knowledge-modalities",
+        help="comma-separated enabled modalities; use an empty value for none",
+    )
+    parser.add_argument(
+        "--knowledge-instances",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="include or exclude supporting skill instances in the task portfolio",
+    )
+    parser.add_argument(
+        "--knowledge-exceptions",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="enable or disable exception/counterexample ranking penalties",
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -54,7 +75,16 @@ def main(argv: list[str] | None = None) -> int:
     _common(ru)
     ru.add_argument("--timeout-sec", type=float, default=None)
 
+    export = sub.add_parser("export", help="export one run's ablation metrics as JSON and CSV")
+    export.add_argument("--run-dir", required=True, type=Path)
+    export.add_argument("--output-dir", required=True, type=Path)
+
     args = ap.parse_args(argv)
+    if args.command == "export":
+        from multisensory.experiments import export_run
+
+        export_run(args.run_dir, args.output_dir)
+        return 0
     test_gpus = None
     if args.test_gpu_slots <= 0:
         ap.error("--test-gpu-slots must be positive")
@@ -67,6 +97,21 @@ def main(argv: list[str] | None = None) -> int:
             ap.error("--test-gpu-slots requires --gpu or --test-gpus")
         test_gpus = [args.gpu]
     cfg = load_task(args.task, env_task=args.env_task)
+    knowledge = cfg.knowledge
+    if args.knowledge_retrieval is not None:
+        knowledge = replace(knowledge, enabled=True, retrieval=args.knowledge_retrieval)
+    if args.knowledge_modalities is not None:
+        modalities = tuple(
+            item.strip() for item in args.knowledge_modalities.split(",") if item.strip()
+        )
+        knowledge = replace(knowledge, enabled=True, modalities=modalities)
+    if args.knowledge_instances is not None:
+        knowledge = replace(knowledge, enabled=True, include_instances=args.knowledge_instances)
+    if args.knowledge_exceptions is not None:
+        knowledge = replace(knowledge, enabled=True, use_exceptions=args.knowledge_exceptions)
+    cfg = replace(cfg, knowledge=knowledge)
+    if cfg.baseline and cfg.knowledge.enabled:
+        ap.error("Baseline cannot enable structured knowledge retrieval")
     if args.test_scenes is not None:
         if args.test_scenes <= 0:
             ap.error("--test-scenes must be positive")
