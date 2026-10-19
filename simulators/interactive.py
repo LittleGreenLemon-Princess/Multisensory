@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import ast
 import builtins
+import importlib
 import math
 from types import SimpleNamespace
 
@@ -123,10 +124,40 @@ def numerical_numpy():
 NUMPY = numerical_numpy()
 
 
+# ndarray reductions use a C-level lazy import with an empty *list* fromlist.
+# Ordinary Python import statements use None or a tuple instead. Resolve only
+# this numerical implementation module in the trusted host, never an arbitrary
+# name supplied by the snippet. NumPy 1.x and 2.x use different package paths.
+try:
+    _NUMPY_ARRAY_METHODS = importlib.import_module("numpy._core._methods")
+except ModuleNotFoundError:
+    _NUMPY_ARRAY_METHODS = importlib.import_module("numpy.core._methods")
+
+
 def numerical_import(name, globals=None, locals=None, fromlist=(), level=0):
+    if (
+        not level
+        and name in {"numpy._core._methods", "numpy.core._methods"}
+        and type(fromlist) is list
+        and not fromlist
+    ):
+        # This return goes to ndarray's internal reduction machinery, not to a
+        # Python import statement. validate_snippet still forbids internal
+        # imports, dynamic __import__, and private attribute access by users.
+        return _NUMPY_ARRAY_METHODS
     if level or name not in {"numpy", "math"}:
         raise ImportError("Only numpy and math are available in robot snippets")
     return NUMPY if name == "numpy" else math
+
+
+def numerical_print(*args, **kwargs):
+    """Format NumPy values in the host frame, preserving restricted imports.
+
+    NumPy dtype formatting lazily imports an internal formatter. Calling print
+    directly from the restricted frame incorrectly denies that internal import.
+    This wrapper changes no user import permissions or robot observations.
+    """
+    return builtins.print(*args, **kwargs)
 
 
 SAFE_BUILTINS = {
@@ -168,6 +199,7 @@ SAFE_BUILTINS = {
         "AssertionError",
     ]
 }
+SAFE_BUILTINS["print"] = numerical_print
 SAFE_BUILTINS["__import__"] = numerical_import
 
 
